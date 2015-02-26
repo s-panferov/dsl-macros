@@ -1,5 +1,5 @@
 #![feature(plugin)]
-#![plugin(rust_dsl)]
+#![plugin(dsl_macros)]
 
 struct Builder {
     counter: u32

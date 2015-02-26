@@ -1,6 +1,6 @@
 #![feature(plugin)]
 #![feature(plugin_registrar)]
-#![feature(dsl_macros)]
+#![feature(rustc_private)]
 
 extern crate syntax;
 extern crate rustc;
