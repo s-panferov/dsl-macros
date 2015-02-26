@@ -1,11 +1,14 @@
 [package]
 
-name = "rust_dsl"
+name = "dsl_macros"
 version = "0.0.1"
 authors = ["Stanislav Panferov <fnight.m@gmail.com>"]
+description = "Convenience macros that rewrites method calls inside a builder closure."
+keywords = ["dsl", "macros"]
+license = "MIT"
 
 [lib]
-name = "rust_dsl"
+name = "dsl_macros"
 path = "src/lib.rs"
 plugin = true
 

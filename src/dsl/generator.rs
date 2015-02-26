@@ -1,18 +1,14 @@
 use syntax::{codemap, ast};
-use syntax::parse;
 use syntax::ptr;
 use syntax::ext::base;
 use syntax::ext::build::AstBuilder;
-use std::borrow::ToOwned;
-use syntax::ext::quote::rt::ToSource;
-use syntax::ext::quote::rt::ExtParseUtils;
 
 fn rewrite(expr: ast::Expr, context: ast::Ident, cx: &mut base::ExtCtxt) -> ptr::P<ast::Expr> {
     let ast::Expr{span, node, ..} = expr;
     match node {
-        ast::Expr_::ExprCall(mut path, mut args) => {
+        ast::Expr_::ExprCall(path, mut args) => {
             let (ident, types) = match (*path).clone().node {
-                ast::Expr_::ExprPath(mut path) => {
+                ast::Expr_::ExprPath(path) => {
                     let ast::PathSegment{identifier, parameters} = path.segments[0].clone();
                     let types = match parameters {
                         ast::PathParameters::AngleBracketedParameters(data) => {
@@ -22,7 +18,7 @@ fn rewrite(expr: ast::Expr, context: ast::Ident, cx: &mut base::ExtCtxt) -> ptr:
                     };
                     (identifier, types.into_vec())
                 },
-                _ => panic!("Wrong path")
+                _ => unreachable!()
             };
 
             args.insert(0, cx.expr_path(cx.path_ident(span, context)));
@@ -34,8 +30,11 @@ fn rewrite(expr: ast::Expr, context: ast::Ident, cx: &mut base::ExtCtxt) -> ptr:
 
 fn rewrite_if_needed(expr: &mut ptr::P<ast::Expr>, context: ast::Ident, cx: &mut base::ExtCtxt) {
     let is_call = match &(*expr).node {
-        &ast::Expr_::ExprCall(..) => {
-            true
+        &ast::Expr_::ExprCall(ref path, _) => {
+            match path.node {
+                ast::Expr_::ExprPath(ref path) if path.segments.len() == 1 => true,
+                _ => false
+            }
         },
         _ => false
     };
@@ -44,12 +43,12 @@ fn rewrite_if_needed(expr: &mut ptr::P<ast::Expr>, context: ast::Ident, cx: &mut
     }
 }
 
-fn extract_name(arg: ast::Arg) -> ast::Ident {
+fn extract_name(arg: ast::Arg, sp: codemap::Span, cx: &mut base::ExtCtxt) -> ast::Ident {
     match arg.pat.node {
         ast::Pat_::PatIdent(_, ident, _) => {
             ident.node.clone()
         },
-        _ => panic!("Only ident is possible as a first argument")
+        _ => cx.span_fatal(sp, "Only ident is possible as a first argument inside dsl!()")
     }
 }
 
@@ -59,10 +58,10 @@ impl super::super::Generator<()> for super::DslState {
             match &mut expr.node {
                 &mut ast::Expr_::ExprClosure(ref _clause, ref decl, ref mut block) => {
                     let first_arg = extract_name(if decl.inputs.len() == 0 {
-                        panic!("The closure expression must have at least one argument");
+                        cx.span_fatal(sp, "The closure expression must have at least one argument inside dsl!()")
                     } else {
                         decl.inputs[0].clone()
-                    });
+                    }, sp, cx);
 
                     *block = block.clone().map(|mut block| {
                         block.expr = Some(block.expr.unwrap().clone().map(|mut expr| {
