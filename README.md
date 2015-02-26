@@ -1,5 +1,12 @@
 This macro can be used with various builders that use closures for configuration. Macro rewrites only simple method calls without a path and leaves other expressions as-is. It do not touch calls like `builder.method()`, `module::method()` or `Class::method()`. Type parameters work as expected, so you can use `method<T>()` and the macro converts it to `context.method<T>()`.
 
+## Сompatible libraries
+
+1. [Rustless](https://github.com/rustless/rustless) — REST-like API micro-framework for Rust. Works with Iron.
+2. [jsonway](https://github.com/rustless/jsonway) — JSON building DSL and configurable serializers for Rust.
+3. [valico](https://github.com/rustless/valico) —  JSON Schema validator and JSON coercer.
+4. Any other library that uses the same pattern for building blocks.
+
 ## Usage
 
 **Source:**
