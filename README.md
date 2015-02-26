@@ -4,6 +4,7 @@ This macro can be used with various builders that use closures for configuration
 
 **Without DSL**:
 
+```rust
 rustless::Namespace::build("tweets", |tweets| {
     tweets.get("latest", |endpoint| {
         endpoint.desc("Get latest tweets");
@@ -15,9 +16,11 @@ rustless::Namespace::build("tweets", |tweets| {
     tweet.post(/* omitted */);
     tweet.delete(/* omitted */);
 })
+```
 
 **With DSL**:
 
+```rust
 rustless::Namespace::build("tweets", dsl!(|tweets| {
     get("latest", dsl!(|endpoint| {
         desc("Get latest tweets");
@@ -29,3 +32,4 @@ rustless::Namespace::build("tweets", dsl!(|tweets| {
     post(/* omitted */);
     delete(/* omitted */);
 }))
+```
