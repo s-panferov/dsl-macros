@@ -8,7 +8,7 @@ fn rewrite(expr: ast::Expr, context: ast::Ident, cx: &mut base::ExtCtxt) -> ptr:
     match node {
         ast::Expr_::ExprCall(path, mut args) => {
             let (ident, types) = match (*path).clone().node {
-                ast::Expr_::ExprPath(path) => {
+                ast::Expr_::ExprPath(_, path) => {
                     let ast::PathSegment{identifier, parameters} = path.segments[0].clone();
                     let types = match parameters {
                         ast::PathParameters::AngleBracketedParameters(data) => {
@@ -32,7 +32,7 @@ fn rewrite_if_needed(expr: &mut ptr::P<ast::Expr>, context: ast::Ident, cx: &mut
     let is_call = match &(*expr).node {
         &ast::Expr_::ExprCall(ref path, _) => {
             match path.node {
-                ast::Expr_::ExprPath(ref path) if path.segments.len() == 1 => true,
+                ast::Expr_::ExprPath(_, ref path) if path.segments.len() == 1 => true,
                 _ => false
             }
         },
@@ -103,7 +103,7 @@ impl super::super::Generator<()> for super::DslState {
             expr
         });
 
-        base::MacExpr::new(self.expr)
+        base::MacEager::expr(self.expr)
     }
 }
 

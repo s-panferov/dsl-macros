@@ -18,7 +18,7 @@ use syntax::parse::parser;
 #[doc(hidden)]
 pub fn plugin_registrar(reg: &mut plugin::Registry) {
     reg.register_syntax_extension(token::intern("dsl"),
-        syntax::ext::base::NormalTT(Box::new(dsl::dsl), None));
+        syntax::ext::base::NormalTT(Box::new(dsl::dsl), None, false));
 }
 
 pub trait Parser<Cfg> {
